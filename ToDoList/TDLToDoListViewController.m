@@ -7,8 +7,12 @@
 //
 
 #import "TDLToDoListViewController.h"
+#import "TDLToDoItem.h"
+#import "TDLAddToDoItemViewController.h"
 
 @interface TDLToDoListViewController ()
+
+@property NSMutableArray *toDoItems;
 
 @end
 
@@ -26,6 +30,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.toDoItems = [[NSMutableArray alloc] init];
+    [self loadInitialData];
 
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -40,36 +47,67 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)loadInitialData
+{
+    TDLToDoItem *item1 = [[TDLToDoItem alloc] init];
+    item1.itemName = @"Kill Mrs. Tickles";
+    [self.toDoItems addObject:item1];
+    TDLToDoItem *item2 = [[TDLToDoItem alloc] init];
+    item2.itemName = @"Pee on Lawren";
+    [self.toDoItems addObject:item2];
+    TDLToDoItem *item3 = [[TDLToDoItem alloc] init];
+    item3.itemName = @"Pet a cheetah";
+    [self.toDoItems addObject:item3];
+}
+
 #pragma mark - Table view data source
-/*
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-#warning Potentially incomplete method implementation.
     // Return the number of sections.
-    return 0;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-#warning Incomplete method implementation.
     // Return the number of rows in the section.
-    return 0;
+    return [self.toDoItems count];
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"ListPrototypeCell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
+    TDLToDoItem *ToDoItem = [self.toDoItems objectAtIndex:indexPath.row];
+    cell.textLabel.text = ToDoItem.itemName;
+    if (ToDoItem.completed){
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    } else {
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
     
     // Configure the cell...
     
     return cell;
-}*/
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    TDLToDoItem *tappedItem = [self.toDoItems objectAtIndex:indexPath.row];
+    tappedItem.completed = !tappedItem.completed;
+    [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+}
 
 - (IBAction)unwindToList:(UIStoryboardSegue *)segue
 {
-    
+    TDLAddToDoItemViewController *source = [segue sourceViewController];
+    TDLToDoItem *item = source.toDoItem;
+    if (item != nil) {
+        [self.toDoItems addObject:item];
+        [self.tableView reloadData];
+    }
 }
 
 /*
